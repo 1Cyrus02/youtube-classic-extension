@@ -1,53 +1,41 @@
 {
   "manifest_version": 2,
-  "name": "YouTube Classic 4WeakPC",
+  "name": "lite4youtube",
   "version": "20.07.2025",
-  "description": "Restore Classic YouTube with H.264 optimization for weak PCs like Intel N100",
-  
+  "description": "Облегчённый YouTube: H.264 + быстрый fullscreen + блок тяжёлых ресурсов.",
   "permissions": [
     "storage",
     "webRequest",
     "webRequestBlocking",
-    "activeTab",
     "cookies",
-    "*://www.youtube.com/*",
     "*://*.youtube.com/*",
-    "*://*.googlevideo.com/*"
+    "*://*.googlevideo.com/*",
+    "*://*.google.com/*",
+    "*://*.googletagmanager.com/*"
   ],
-  
-  "content_scripts": [
-    {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["content_script.js"],
-      "run_at": "document_start",
-      "all_frames": false
-    }
-  ],
-  
   "background": {
-    "scripts": ["cookie.js", "background.js"],
+    "scripts": ["cookie.js","background.js"],
     "persistent": true
   },
-  
+  "content_scripts": [{
+    "matches": ["*://*.youtube.com/*"],
+    "js": ["content_script.js"],
+    "run_at": "document_start"
+  }],
   "browser_action": {
+    "default_title": "lite4youtube",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "images/yt_classic16.png",
       "32": "images/yt_classic32.png",
       "48": "images/yt_classic48.png",
       "128": "images/yt_classic128.png"
-    },
-    "default_popup": "popup.html",
-    "default_title": "YouTube Classic 4WeakPC"
+    }
   },
-  
   "icons": {
     "16": "images/yt_classic16.png",
     "32": "images/yt_classic32.png",
     "48": "images/yt_classic48.png",
     "128": "images/yt_classic128.png"
-  },
-  
-  "web_accessible_resources": [
-    "content_script.js"
-  ]
+  }
 }
