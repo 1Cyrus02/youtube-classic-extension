@@ -1,19 +1,83 @@
 // js/fast_fullscreen.js
-// Fast Fullscreen: скрываем тяжёлые блоки до/во время fullscreen, возвращаем после.
-
 (function() {
-  if (window.__L4Y_FS__) return;
-  window.__L4Y_FS__ = true;
+  if (window.top !== window) return; // не в iframe
 
-  const RESTORE_DELAY = 400;
+  let enabled = true;  // по умолчанию
 
-  // Скрываем перед кликом на fullscreen-кнопку или dblclick по видео
-  function preHide() {
-    document.documentElement.classList.add('l4y-pre-fs');
+  // Прочитать настройку
+  chrome.storage.local.get('fastFS', data => {
+    if (data.fastFS === false) enabled = false;
+    update(enabled);
+  });
+
+  // Обрабатывать переключения из popup
+  chrome.runtime.onMessage.addListener((msg, sender, respond) => {
+    if (msg.type === 'L4Y_FS_CHANGED') {
+      enabled = Boolean(msg.value);
+      console.log('[Lite4YouTube] Fast Fullscreen enabled=', enabled);
+      update(enabled);
+    }
+  });
+
+  // Основная логика включения/выключения
+  function update(on) {
+    if (on) {
+      activate();
+    } else {
+      deactivate();
+    }
   }
 
-  // Вешаем на кнопку и видео
-  new MutationObserver(() => {
+  // Переменные для наблюдателя и обработчиков
+  let mo, keydownHandler, fsChangeHandler;
+  const RESTORE_DELAY = 400;
+  const PRE_CLASS = 'l4y-pre-fs', FS_CLASS = 'l4y-fs';
+
+  function activate() {
+    // Защита от повторного включения
+    if (mo) return;
+
+    // Наблюдаем за кнопкой и видео
+    mo = new MutationObserver(attachListeners);
+    mo.observe(document.documentElement, {childList:true, subtree:true});
+    attachListeners();
+
+    // Клавиша F
+    keydownHandler = e => { if (e.key.toLowerCase()==='f') preHide(); };
+    document.addEventListener('keydown', keydownHandler, {capture:true});
+
+    // Fullscreenchange
+    fsChangeHandler = () => {
+      setTimeout(() => {
+        document.documentElement.classList.remove(PRE_CLASS);
+        const isFS = !!document.fullscreenElement;
+        document.documentElement.classList.toggle(FS_CLASS, isFS);
+      }, RESTORE_DELAY);
+    };
+    ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange']
+      .forEach(ev => document.addEventListener(ev, fsChangeHandler, {passive:true}));
+
+    console.log('[Lite4YouTube] Fast Fullscreen active.');
+  }
+
+  function deactivate() {
+    // Убрать классы
+    document.documentElement.classList.remove(PRE_CLASS, FS_CLASS);
+
+    // Отключить MutationObserver
+    if (mo) {
+      mo.disconnect();
+      mo = null;
+    }
+
+    // Удалить обработчики
+    document.removeEventListener('keydown', keydownHandler, {capture:true});
+    ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange']
+      .forEach(ev => document.removeEventListener(ev, fsChangeHandler));
+    console.log('[Lite4YouTube] Fast Fullscreen deactivated.');
+  }
+
+  function attachListeners() {
     const btn = document.querySelector('.ytp-fullscreen-button:not([data-l4y])');
     if (btn) {
       btn.dataset.l4y = '1';
@@ -24,23 +88,10 @@
       vid.dataset.l4y = '1';
       vid.addEventListener('dblclick', preHide, {capture:true});
     }
-  }).observe(document.documentElement, {childList:true, subtree:true});
-
-  // Клавиша F
-  document.addEventListener('keydown', e => {
-    if (e.key.toLowerCase() === 'f') preHide();
-  }, {capture:true});
-
-  // После переключения fullscreen убираем класс и ставим .l4y-fs во время FS
-  function onFS() {
-    setTimeout(() => {
-      document.documentElement.classList.remove('l4y-pre-fs');
-      const isFS = document.fullscreenElement != null;
-      document.documentElement.classList.toggle('l4y-fs', isFS);
-    }, RESTORE_DELAY);
   }
-  ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange']
-    .forEach(ev => document.addEventListener(ev, onFS, {passive:true}));
 
-  console.log('[Lite4YouTube] Fast Fullscreen active.');
+  function preHide() {
+    document.documentElement.classList.add(PRE_CLASS);
+  }
+
 })();

@@ -2,6 +2,9 @@
 // loader: инжектит h264-inject.js в MAIN world только 1 раз на вкладку по настройке forceH264.
 
 (function() {
+  // Не выполняем в iframe
+  if (window.top !== window) return;
+
   const KEY = '__L4Y_H264_LOADED__';
   if (window[KEY]) return;
   window[KEY] = true;
