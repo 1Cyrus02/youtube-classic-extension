@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Lite4YouTube (H264 + Fast FS Test)",
+  "version": "0.0.1",
+  "description": "Принудительно H.264 на YouTube и быстрый fullscreen (тестовая сборка).",
+  "icons": {
+    "128": "icon.png"
+  },
+  "action": {
+    "default_icon": "icon.png",
+    "default_title": "Lite4YouTube"
+  },
+  "permissions": [
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.youtube-nocookie.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.youtube-nocookie.com/*"
+      ],
+      "js": ["js/h264-loader.js", "js/fast_fullscreen.js"],
+      "css": ["css/fast_fullscreen.css"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [{
+    "resources": ["js/h264-inject.js"],
+    "matches": ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*"]
+  }]
+}
