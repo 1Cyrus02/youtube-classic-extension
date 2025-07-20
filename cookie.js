@@ -1,41 +1,30 @@
-"use strict";
-
 class CookieStore {
-	constructor(cookieHeader) {
-		if (typeof cookieHeader !== "string") {
-			this.cookieList = [];
-		} else {
-			this.cookieList = cookieHeader
-				.split(";")
-				.map(item => item.trim())
-				.filter(item => item.length > 0)
-				.map(item => {
-					const i = item.indexOf("=");
-					return [item.substr(0, i), item.substr(i + 1)];
-				});
-		}
-	}
+  constructor(cookieString) {
+    this.cookies = {};
+    (cookieString || "").split(";").forEach((cookie) => {
+      let [name, value] = cookie.split("=");
+      name = (name || "").trim();
+      if (name) {
+        this.cookies[name] = (value || "").trim();
+      }
+    });
+  }
 
-	find(name) {
-		return this.cookieList.find(item => item[0] === name);
-	}
+  getItem(name) {
+    return this.cookies[name] || null;
+  }
 
-	getItem(name, defaultValue) {
-		const item = this.find(name);
-		return item !== undefined ? item[1] : defaultValue;
-	}
+  setItem(name, value) {
+    this.cookies[name] = value;
+  }
 
-	setItem(name, value) {
-		var item = this.find(name);
+  removeItem(name) {
+    delete this.cookies[name];
+  }
 
-		if (item !== undefined) {
-			item[1] = value;
-		} else {
-			this.cookieList.push([name, value]);
-		}
-	}
-
-	stringify() {
-		return this.cookieList.map(item => item[0] + "=" + item[1]).join("; ");
-	}
+  stringify() {
+    return Object.keys(this.cookies)
+      .map((key) => `${key}=${this.cookies[key]}`)
+      .join("; ");
+  }
 }
