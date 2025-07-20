@@ -1,32 +1,21 @@
-/* fast_fullscreen.css
-   Скрываем тяжёлые блоки при подготовке к fullscreen и/или во время fullscreen.
-   Основано на идее расширения YouTube Fast Fullscreen Toggle: убрать "heavy fluff"
-   (плейлисты, рекомендации, комментарии) до переключения, чтобы не было лага. :contentReference[oaicite:10]{index=10} */
-
+/* Скрываем тяжёлые блоки до/во время fullscreen */
 html.l4y-pre-fs #secondary,
 html.l4y-pre-fs #comments,
 html.l4y-pre-fs #related,
 html.l4y-pre-fs ytd-watch-next-secondary-results-renderer,
 html.l4y-pre-fs ytd-live-chat-frame,
 html.l4y-pre-fs #chat-container,
-html.l4y-pre-fs #below,
-html.l4y-pre-fs #below-the-fold {
-  display: none !important;
-}
 
-/* Дополнительно скрываем во время fullscreen */
 html.l4y-fs #secondary,
 html.l4y-fs #comments,
 html.l4y-fs #related,
 html.l4y-fs ytd-watch-next-secondary-results-renderer,
 html.l4y-fs ytd-live-chat-frame,
-html.l4y-fs #chat-container,
-html.l4y-fs #below,
-html.l4y-fs #below-the-fold {
+html.l4y-fs #chat-container {
   display: none !important;
 }
 
-/* Немного облегчений для UI плеера */
+/* Лёгкое упрощение UI плеера */
 .ytp-chrome-bottom {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;

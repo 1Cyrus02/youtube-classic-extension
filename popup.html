@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lite4YouTube</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 10px; width: 220px; }
+    label { display: flex; align-items: center; cursor: pointer; }
+    input { margin-right: 8px; transform: scale(1.2); }
+    .note { margin-top: 8px; font-size: 12px; color: #555; }
+  </style>
+</head>
+<body>
+  <label>
+    <input type="checkbox" id="toggleH264" />
+    Force H.264 (avc1)
+  </label>
+  <div class="note">
+    После смены перезагрузите вкладку YouTube (F5).
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
