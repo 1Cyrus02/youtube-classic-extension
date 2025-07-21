@@ -1,16 +1,15 @@
 // popup.js
 document.addEventListener('DOMContentLoaded', () => {
-  const cbH264 = document.getElementById('toggleH264');
-  const cbFS   = document.getElementById('toggleFS');
+  const cbH264    = document.getElementById('toggleH264');
+  const cbFS      = document.getElementById('toggleFS');
   const btnReload = document.getElementById('reloadBtn');
 
-  // Инициализация значений
+  // Инициализация из storage
   chrome.storage.local.get(['forceH264','fastFS'], data => {
-    cbH264.checked = data.forceH264 !== false;
-    cbFS.checked   = data.fastFS   !== false;
+    cbH264.checked = data.forceH264 !== false; // default ON
+    cbFS.checked   = data.fastFS   !== false;  // default ON
   });
 
-  // Функция уведомления вкладкам
   function notifyAll(type, value) {
     chrome.tabs.query({ url: '*://*.youtube.com/*' }, tabs => {
       for (const t of tabs) {
@@ -19,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Переключатель Force H.264
+  // Force H.264
   cbH264.addEventListener('change', () => {
     const on = cbH264.checked;
     chrome.storage.local.set({ forceH264: on }, () => {
@@ -28,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Переключатель Fast Fullscreen
+  // Fast Fullscreen (единый режим)
   cbFS.addEventListener('change', () => {
     const on = cbFS.checked;
     chrome.storage.local.set({ fastFS: on }, () => {
@@ -40,9 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Кнопка перезагрузки активной вкладки
   btnReload.addEventListener('click', () => {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      if (tabs[0]?.id) {
-        chrome.tabs.reload(tabs[0].id);
-      }
+      if (tabs[0]?.id) chrome.tabs.reload(tabs[0].id);
     });
   });
 });

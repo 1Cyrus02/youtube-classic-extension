@@ -1,97 +1,12 @@
-// js/fast_fullscreen.js
-(function() {
-  if (window.top !== window) return; // не в iframe
-
-  let enabled = true;  // по умолчанию
-
-  // Прочитать настройку
-  chrome.storage.local.get('fastFS', data => {
-    if (data.fastFS === false) enabled = false;
-    update(enabled);
-  });
-
-  // Обрабатывать переключения из popup
-  chrome.runtime.onMessage.addListener((msg, sender, respond) => {
-    if (msg.type === 'L4Y_FS_CHANGED') {
-      enabled = Boolean(msg.value);
-      console.log('[Lite4YouTube] Fast Fullscreen enabled=', enabled);
-      update(enabled);
-    }
-  });
-
-  // Основная логика включения/выключения
-  function update(on) {
-    if (on) {
-      activate();
-    } else {
-      deactivate();
-    }
-  }
-
-  // Переменные для наблюдателя и обработчиков
-  let mo, keydownHandler, fsChangeHandler;
-  const RESTORE_DELAY = 400;
-  const PRE_CLASS = 'l4y-pre-fs', FS_CLASS = 'l4y-fs';
-
-  function activate() {
-    // Защита от повторного включения
-    if (mo) return;
-
-    // Наблюдаем за кнопкой и видео
-    mo = new MutationObserver(attachListeners);
-    mo.observe(document.documentElement, {childList:true, subtree:true});
-    attachListeners();
-
-    // Клавиша F
-    keydownHandler = e => { if (e.key.toLowerCase()==='f') preHide(); };
-    document.addEventListener('keydown', keydownHandler, {capture:true});
-
-    // Fullscreenchange
-    fsChangeHandler = () => {
-      setTimeout(() => {
-        document.documentElement.classList.remove(PRE_CLASS);
-        const isFS = !!document.fullscreenElement;
-        document.documentElement.classList.toggle(FS_CLASS, isFS);
-      }, RESTORE_DELAY);
-    };
-    ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange']
-      .forEach(ev => document.addEventListener(ev, fsChangeHandler, {passive:true}));
-
-    console.log('[Lite4YouTube] Fast Fullscreen active.');
-  }
-
-  function deactivate() {
-    // Убрать классы
-    document.documentElement.classList.remove(PRE_CLASS, FS_CLASS);
-
-    // Отключить MutationObserver
-    if (mo) {
-      mo.disconnect();
-      mo = null;
-    }
-
-    // Удалить обработчики
-    document.removeEventListener('keydown', keydownHandler, {capture:true});
-    ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange']
-      .forEach(ev => document.removeEventListener(ev, fsChangeHandler));
-    console.log('[Lite4YouTube] Fast Fullscreen deactivated.');
-  }
-
-  function attachListeners() {
-    const btn = document.querySelector('.ytp-fullscreen-button:not([data-l4y])');
-    if (btn) {
-      btn.dataset.l4y = '1';
-      btn.addEventListener('click', preHide, {capture:true});
-    }
-    const vid = document.querySelector('video');
-    if (vid && !vid.dataset.l4y) {
-      vid.dataset.l4y = '1';
-      vid.addEventListener('dblclick', preHide, {capture:true});
-    }
-  }
-
-  function preHide() {
-    document.documentElement.classList.add(PRE_CLASS);
-  }
-
-})();
+(()=>{if(window.top!==window)return
+let e=1,a=0,v,o={},ov=null,S='fastFS',V='video.html5-main-video,ytd-player video,video',H='.ytp-gradient-bottom,.ytp-chrome-bottom,.ytp-chrome-top,.ytp-play-button,.ytp-show-cards-title,.ytp-watermark,ytd-player .ytp-ce-element'
+const hide=()=>document.querySelectorAll(H).forEach(x=>x.style.display='none'),show=()=>document.querySelectorAll(H).forEach(x=>x.style.display='')
+const enter=()=>{if(a)return;v=document.querySelector(V);if(!v)return;ov=document.createElement('div');Object.assign(ov.style,{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'black',display:'flex',justifyContent:'center',alignItems:'center',overflow:'hidden',zIndex:'9999999999'});document.body.appendChild(ov);o={parent:v.parentNode,next:v.nextSibling,style:{width:v.style.width,height:v.style.height,objectFit:v.style.objectFit}};ov.appendChild(v);Object.assign(v.style,{width:'100%',height:'100%',objectFit:'contain'});hide();document.documentElement.style.overflow='hidden';a=1;console.log('[Lite4YouTube] FS → ON')}
+const exit=()=>{if(!a)return;if(v&&o.parent){o.next?o.parent.insertBefore(v,o.next):o.parent.appendChild(v);Object.assign(v.style,o.style)}if(ov){ov.remove();ov=null}show();document.documentElement.style.overflow='';a=0;console.log('[Lite4YouTube] FS → OFF')}
+const toggle=()=>{if(!e)return;a?exit():enter()}
+const keyHandler=k=>{if(!e)return;let c=k.key.toLowerCase();if(c=='f'||k.code=='KeyF'){k.preventDefault();k.stopPropagation();k.stopImmediatePropagation();toggle()}else if((c=='escape'||c=='esc')&&a){k.preventDefault();k.stopPropagation();k.stopImmediatePropagation();exit()}}
+document.addEventListener('keydown',keyHandler,{capture:1});document.addEventListener('keypress',keyHandler,{capture:1});document.addEventListener('pointerdown',k=>{if(!e)return;if(k.target.closest('.ytp-fullscreen-button')){k.preventDefault();k.stopPropagation();toggle()}},{capture:1});document.addEventListener('dblclick',k=>{if(!e)return;if(k.target.matches(V)){k.preventDefault();k.stopPropagation();toggle()}},{capture:1})
+chrome.runtime.onMessage.addListener(m=>{if(m.type=='L4Y_FS_CHANGED'){e=!!m.value;if(!e&&a)exit();console.log('[Lite4YouTube] FS set →',e)}})
+chrome.storage.local.get(S,d=>{e=d.fastFS!==!1;console.log('[Lite4YouTube] FS init →',e)})
+let lastUrl=location.href;setInterval(()=>{if(location.href!==lastUrl){lastUrl=location.href;if(a)exit()}},1e3)
+})()

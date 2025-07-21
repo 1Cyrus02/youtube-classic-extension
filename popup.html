@@ -4,11 +4,10 @@
   <meta charset="UTF-8" />
   <title>Lite4YouTube</title>
   <style>
-    /* Подключаем Nimbus Sans Narrow, если доступен в системе */
     body {
       font-family: "Nimbus Sans Narrow", Arial, sans-serif;
       padding: 10px;
-      width: 175px;
+      width: 260px;
       box-sizing: border-box;
       position: relative;
     }
@@ -28,23 +27,29 @@
       margin-top: 8px;
       font-size: 12px;
       color: #555;
+      line-height: 1.2;
     }
-    /* Кнопка перезагрузки */
+    /* Reload button (icon set via CSS background) */
     #reloadBtn {
       position: absolute;
       top: 8px;
       right: 8px;
-      width: 21px;
-      height: 21px;
+      width: 20px;
+      height: 20px;
       background: url('reload-icon.png') no-repeat center center;
       background-size: contain;
       border: none;
+      padding: 0;
+      margin: 0;
       cursor: pointer;
+    }
+    #reloadBtn:active {
+      transform: scale(0.95);
     }
   </style>
 </head>
 <body>
-  <!-- Кнопка перезагрузки вкладки -->
+  <!-- Reload active tab -->
   <button id="reloadBtn" title="Reload tab"></button>
 
   <label>
@@ -55,9 +60,11 @@
     <input type="checkbox" id="toggleFS" />
     Fast Fullscreen
   </label>
+
   <div class="note">
     Need to restart the tab after changes
   </div>
+
   <script src="popup.js"></script>
 </body>
 </html>

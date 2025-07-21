@@ -1,25 +1,41 @@
-/* Скрываем тяжёлые блоки до/во время fullscreen */
-html.l4y-pre-fs #secondary,
-html.l4y-pre-fs #comments,
-html.l4y-pre-fs #related,
-html.l4y-pre-fs ytd-watch-next-secondary-results-renderer,
-html.l4y-pre-fs ytd-live-chat-frame,
-html.l4y-pre-fs #chat-container,
-
-html.l4y-fs #secondary,
-html.l4y-fs #comments,
-html.l4y-fs #related,
-html.l4y-fs ytd-watch-next-secondary-results-renderer,
-html.l4y-fs ytd-live-chat-frame,
-html.l4y-fs #chat-container {
-  display: none !important;
+/* Fast Fullscreen Mode */
+html.fast-fs-active,
+body.fast-fs-active {
+  overflow: hidden !important;
+  height: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: black !important;
 }
 
-/* Лёгкое упрощение UI плеера */
-.ytp-chrome-bottom {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+.fast-fs-active #player,
+.fast-fs-active #movie_player,
+.fast-fs-active .html5-video-player {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 999999 !important;
+  background: black !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
-.ytp-hover-progress .ytp-thumbnail-overlay-image {
-  display: none !important;
+
+.fast-fs-active video {
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  background: black !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  transition: none !important;
+  filter: none !important;
 }
